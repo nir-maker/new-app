@@ -6,7 +6,126 @@
     <title>רשימת קניות</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* ... שאר הקוד ללא שינוי ... */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            direction: rtl;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 50px auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #333333;
+        }
+
+        .input-container {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        #item-input {
+            flex: 1;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #cccccc;
+            border-radius: 4px;
+            margin-left: 10px;
+        }
+
+        #add-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #28a745;
+            border: none;
+            color: #ffffff;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        #add-button:hover {
+            background-color: #218838;
+        }
+
+        #shopping-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        #shopping-list li {
+            background-color: #f8f9fa;
+            padding: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        #shopping-list li.bought {
+            background-color: #d4edda;
+            text-decoration: line-through;
+            color: #6c757d;
+        }
+
+        #shopping-list li span {
+            flex: 1;
+            font-size: 16px;
+        }
+
+        .delete-button, .bought-button {
+            margin-left: 10px;
+            padding: 6px 12px;
+            border: none;
+            color: #ffffff;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .delete-button {
+            background-color: #dc3545;
+        }
+
+        .delete-button:hover {
+            background-color: #c82333;
+        }
+
+        .bought-button {
+            background-color: #007bff;
+        }
+
+        .bought-button:hover {
+            background-color: #0056b3;
+        }
+
+        #share-button {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            background-color: #25d366;
+            border: none;
+            color: #ffffff;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+
+        #share-button:hover {
+            background-color: #1ebe57;
+        }
     </style>
 </head>
 <body>
@@ -28,6 +147,13 @@
             if (itemText !== '') {
                 addItemToList(itemText);
                 itemInput.value = '';
+                itemInput.focus();
+            }
+        });
+
+        document.getElementById('item-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('add-button').click();
             }
         });
 
@@ -49,6 +175,14 @@
             textSpan.textContent = itemText;
             listItem.appendChild(textSpan);
 
+            const boughtButton = document.createElement('button');
+            boughtButton.textContent = 'סמן כנקנה';
+            boughtButton.classList.add('bought-button');
+            boughtButton.addEventListener('click', function() {
+                listItem.classList.toggle('bought');
+                saveData();
+            });
+
             const deleteButton = document.createElement('button');
             deleteButton.textContent = 'מחק';
             deleteButton.classList.add('delete-button');
@@ -57,16 +191,8 @@
                 saveData();
             });
 
-            const boughtButton = document.createElement('button');
-            boughtButton.textContent = 'סומן כנקנה';
-            boughtButton.classList.add('bought-button');
-            boughtButton.addEventListener('click', function() {
-                listItem.classList.toggle('bought');
-                saveData();
-            });
-
-            listItem.appendChild(deleteButton);
             listItem.appendChild(boughtButton);
+            listItem.appendChild(deleteButton);
 
             if (bought) {
                 listItem.classList.add('bought');
@@ -90,7 +216,6 @@
             localStorage.setItem('shoppingList', JSON.stringify(itemList));
         }
 
-        // טעינת הנתונים מ-Local Storage
         window.addEventListener('load', function() {
             const savedItems = JSON.parse(localStorage.getItem('shoppingList')) || [];
             savedItems.forEach(item => {
