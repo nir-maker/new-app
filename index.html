@@ -1,10 +1,24 @@
 <!DOCTYPE html>
 <html lang="he">
 <head>
-    <!-- ... שאר הקוד ללא שינוי ... -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>רשימת קניות</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* ... שאר הקוד ללא שינוי ... */
+    </style>
 </head>
 <body>
-    <!-- ... שאר הקוד ללא שינוי ... -->
+    <div class="container">
+        <h2>רשימת קניות</h2>
+        <div class="input-container">
+            <input type="text" id="item-input" placeholder="הוסף פריט...">
+            <button id="add-button">הוסף</button>
+        </div>
+        <ul id="shopping-list"></ul>
+        <button id="share-button">שתף בווטסאפ</button>
+    </div>
 
     <script>
         document.getElementById('add-button').addEventListener('click', function() {
@@ -21,15 +35,19 @@
             const items = document.querySelectorAll('#shopping-list li');
             let itemList = 'רשימת קניות:\n';
             items.forEach(item => {
-                itemList += '- ' + item.firstChild.textContent + '\n';
+                const text = item.querySelector('span').textContent;
+                itemList += '- ' + text + '\n';
             });
             const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(itemList)}`;
             window.open(whatsappUrl, '_blank');
         });
 
-        function addItemToList(itemText) {
+        function addItemToList(itemText, bought = false) {
             const listItem = document.createElement('li');
-            listItem.textContent = itemText;
+
+            const textSpan = document.createElement('span');
+            textSpan.textContent = itemText;
+            listItem.appendChild(textSpan);
 
             const deleteButton = document.createElement('button');
             deleteButton.textContent = 'מחק';
@@ -49,6 +67,11 @@
 
             listItem.appendChild(deleteButton);
             listItem.appendChild(boughtButton);
+
+            if (bought) {
+                listItem.classList.add('bought');
+            }
+
             document.getElementById('shopping-list').appendChild(listItem);
 
             saveData();
@@ -58,8 +81,9 @@
             const items = document.querySelectorAll('#shopping-list li');
             let itemList = [];
             items.forEach(item => {
+                const text = item.querySelector('span').textContent;
                 itemList.push({
-                    text: item.firstChild.textContent,
+                    text: text,
                     bought: item.classList.contains('bought')
                 });
             });
@@ -70,14 +94,7 @@
         window.addEventListener('load', function() {
             const savedItems = JSON.parse(localStorage.getItem('shoppingList')) || [];
             savedItems.forEach(item => {
-                addItemToList(item.text);
-                if (item.bought) {
-                    document.querySelectorAll('#shopping-list li').forEach(listItem => {
-                        if (listItem.firstChild.textContent === item.text) {
-                            listItem.classList.add('bought');
-                        }
-                    });
-                }
+                addItemToList(item.text, item.bought);
             });
         });
     </script>
